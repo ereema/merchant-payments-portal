@@ -6,8 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "test": "ng run merchant-payments-portal:vitest --watch=false",
+    "test:watch": "ng run merchant-payments-portal:vitest --watch=true",
+    "test:karma": "ng test --watch=false"
   },
   "prettier": {
     "printWidth": 100,
