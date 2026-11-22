@@ -1,0 +1,618 @@
+
+<div class="application-page">
+  <div class="application-shell">
+
+    <!-- Page header -->
+    <header class="page-header">
+      <div class="page-heading">
+        <div class="breadcrumb">
+          <span>Workspace</span>
+          <span class="breadcrumb-separator">/</span>
+          <span>Applications</span>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-current">
+            {{ isEdit() ? 'Edit application' : 'New application' }}
+          </span>
+        </div>
+
+        <div class="heading-content">
+          <div class="heading-icon">
+            <span>{{ isEdit() ? '✎' : '+' }}</span>
+          </div>
+
+          <div>
+            <h1>{{ isEdit() ? 'Edit application' : 'New application' }}</h1>
+            <p>Complete the details below to register a merchant.</p>
+          </div>
+        </div>
+      </div>
+
+      <a routerLink="/dashboard" class="cancel-link">
+        <span class="cancel-arrow">←</span>
+        Cancel
+      </a>
+    </header>
+
+    <!-- Application card -->
+    <main class="application-card">
+
+      <!-- Card heading -->
+      <div class="card-heading">
+        <div>
+          <span class="eyebrow">APPLICATION FORM</span>
+          <h2>Merchant information</h2>
+          <p>Follow the steps to complete your application.</p>
+        </div>
+
+        <div class="step-counter">
+          <div>
+            <strong>{{ currentStep() | number:'2.0' }}</strong>
+            <span>/ {{ totalSteps | number:'2.0' }}</span>
+          </div>
+          <small>Current step</small>
+        </div>
+      </div>
+
+      <!-- Stepper -->
+      <div class="stepper-section">
+        <div class="stepper">
+
+          <div class="stepper-track">
+            <div
+              class="stepper-progress"
+              [style.width.%]="((currentStep() - 1) / (totalSteps - 1)) * 100"
+            ></div>
+          </div>
+
+          <!-- Step 1 -->
+          <div
+            class="step-item"
+            [class.is-active]="currentStep() === 1"
+            [class.is-complete]="currentStep() > 1"
+          >
+            <div class="step-circle">
+              @if (currentStep() > 1) {
+                <span class="check-icon">✓</span>
+              } @else {
+                <span>01</span>
+              }
+            </div>
+
+            <div class="step-details">
+              <span class="step-label">STEP 01</span>
+              <strong>Business details</strong>
+              <small>Company information</small>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div
+            class="step-item"
+            [class.is-active]="currentStep() === 2"
+            [class.is-complete]="currentStep() > 2"
+          >
+            <div class="step-circle">
+              @if (currentStep() > 2) {
+                <span class="check-icon">✓</span>
+              } @else {
+                <span>02</span>
+              }
+            </div>
+
+            <div class="step-details">
+              <span class="step-label">STEP 02</span>
+              <strong>Contact & address</strong>
+              <small>Location and contact</small>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div
+            class="step-item"
+            [class.is-active]="currentStep() === 3"
+          >
+            <div class="step-circle">
+              <span>03</span>
+            </div>
+
+            <div class="step-details">
+              <span class="step-label">STEP 03</span>
+              <strong>Banking details</strong>
+              <small>Financial information</small>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Save status -->
+      <div class="form-meta">
+        <div class="save-status">
+          @if (saving()) {
+            <span class="status-dot is-saving"></span>
+            <span>Saving your draft...</span>
+          } @else if (lastSaved()) {
+            <span class="status-dot is-saved"></span>
+            <span>Draft saved {{ lastSaved() }}</span>
+          } @else {
+            <span class="status-dot is-idle"></span>
+            <span>Changes will be saved as a draft</span>
+          }
+        </div>
+
+        <span class="required-note">
+          <span>*</span> Required fields
+        </span>
+      </div>
+
+      <!-- Save error -->
+      @if (saveError()) {
+        <div class="form-error-banner">
+          <span class="error-symbol">!</span>
+          <span>{{ saveError() }}</span>
+        </div>
+      }
+
+      <!-- Form -->
+      <form [formGroup]="form" class="application-form">
+
+        <div class="form-content">
+
+          <!-- STEP 1 -->
+          @if (currentStep() === 1) {
+            <section class="form-step">
+
+              <div class="section-heading">
+                <div>
+                  <span class="section-kicker">01 — BUSINESS PROFILE</span>
+                  <h3>Business information</h3>
+                  <p>Tell us about the company you want to register.</p>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label class="form-label">
+                  Business name <span>*</span>
+                </label>
+                <input
+                  class="form-control"
+                  formControlName="businessName"
+                  placeholder="Enter registered business name"
+                  [class.is-invalid]="showError('businessName')"
+                />
+                @if (showError('businessName')) {
+                  <div class="invalid-feedback">
+                    {{ getError('businessName') }}
+                  </div>
+                }
+              </div>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="field-group">
+                    <label class="form-label">
+                      Business type <span>*</span>
+                    </label>
+                    <select
+                      class="form-select"
+                      formControlName="businessType"
+                      [class.is-invalid]="showError('businessType')"
+                    >
+                      <option value="">Select business type</option>
+                      @for (t of businessTypes; track t) {
+                        <option [value]="t">{{ t }}</option>
+                      }
+                    </select>
+                    @if (showError('businessType')) {
+                      <div class="invalid-feedback">
+                        {{ getError('businessType') }}
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="field-group">
+                    <label class="form-label">
+                      Registration number <span>*</span>
+                    </label>
+                    <input
+                      class="form-control"
+                      formControlName="registrationNumber"
+                      placeholder="Enter registration number"
+                      [class.is-invalid]="showError('registrationNumber')"
+                    />
+                    @if (showError('registrationNumber')) {
+                      <div class="invalid-feedback">
+                        {{ getError('registrationNumber') }}
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="field-group">
+                    <label class="form-label">
+                      Industry <span>*</span>
+                    </label>
+                    <select
+                      class="form-select"
+                      formControlName="industry"
+                      [class.is-invalid]="showError('industry')"
+                    >
+                      <option value="">Select industry</option>
+                      @for (i of industries; track i) {
+                        <option [value]="i">{{ i }}</option>
+                      }
+                    </select>
+                    @if (showError('industry')) {
+                      <div class="invalid-feedback">
+                        {{ getError('industry') }}
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="field-group">
+                    <label class="form-label">Website</label>
+                    <input
+                      class="form-control"
+                      formControlName="website"
+                      placeholder="https://example.com"
+                    />
+                  </div>
+                </div>
+              </div>
+
+            </section>
+          }
+
+          <!-- STEP 2 -->
+          @if (currentStep() === 2) {
+            <section class="form-step">
+
+              <div class="section-heading">
+                <div>
+                  <span class="section-kicker">02 — CONTACT DETAILS</span>
+                  <h3>Contact & address</h3>
+                  <p>Provide the primary contact and business location.</p>
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="field-group">
+                    <label class="form-label">
+                      Contact name <span>*</span>
+                    </label>
+                    <input
+                      class="form-control"
+                      formControlName="contactName"
+                      placeholder="Full name"
+                      [class.is-invalid]="showError('contactName')"
+                    />
+                    @if (showError('contactName')) {
+                      <div class="invalid-feedback">
+                        {{ getError('contactName') }}
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="field-group">
+                    <label class="form-label">
+                      Contact email <span>*</span>
+                    </label>
+                    <input
+                      class="form-control"
+                      formControlName="contactEmail"
+                      type="email"
+                      placeholder="name@company.com"
+                      [class.is-invalid]="showError('contactEmail')"
+                    />
+                    @if (showError('contactEmail')) {
+                      <div class="invalid-feedback">
+                        {{ getError('contactEmail') }}
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="field-group">
+                    <label class="form-label">
+                      Phone <span>*</span>
+                    </label>
+                    <input
+                      class="form-control"
+                      formControlName="contactPhone"
+                      placeholder="Enter phone number"
+                      [class.is-invalid]="showError('contactPhone')"
+                    />
+                    @if (showError('contactPhone')) {
+                      <div class="invalid-feedback">
+                        {{ getError('contactPhone') }}
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-divider">
+                <span>BUSINESS ADDRESS</span>
+              </div>
+
+              <div class="field-group">
+                <label class="form-label">
+                  Address line 1 <span>*</span>
+                </label>
+                <input
+                  class="form-control"
+                  formControlName="addressLine1"
+                  placeholder="Street address"
+                  [class.is-invalid]="showError('addressLine1')"
+                />
+                @if (showError('addressLine1')) {
+                  <div class="invalid-feedback">
+                    {{ getError('addressLine1') }}
+                  </div>
+                }
+              </div>
+
+              <div class="field-group">
+                <label class="form-label">Address line 2</label>
+                <input
+                  class="form-control"
+                  formControlName="addressLine2"
+                  placeholder="Apartment, suite, unit, etc. (optional)"
+                />
+              </div>
+
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="field-group">
+                    <label class="form-label">
+                      City <span>*</span>
+                    </label>
+                    <input
+                      class="form-control"
+                      formControlName="city"
+                      placeholder="City"
+                      [class.is-invalid]="showError('city')"
+                    />
+                    @if (showError('city')) {
+                      <div class="invalid-feedback">
+                        {{ getError('city') }}
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="field-group">
+                    <label class="form-label">
+                      State / Province <span>*</span>
+                    </label>
+                    <input
+                      class="form-control"
+                      formControlName="state"
+                      placeholder="State"
+                      [class.is-invalid]="showError('state')"
+                    />
+                    @if (showError('state')) {
+                      <div class="invalid-feedback">
+                        {{ getError('state') }}
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="field-group">
+                    <label class="form-label">
+                      Postal code <span>*</span>
+                    </label>
+                    <input
+                      class="form-control"
+                      formControlName="postalCode"
+                      placeholder="Postal code"
+                      [class.is-invalid]="showError('postalCode')"
+                    />
+                    @if (showError('postalCode')) {
+                      <div class="invalid-feedback">
+                        {{ getError('postalCode') }}
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="field-group">
+                    <label class="form-label">
+                      Country <span>*</span>
+                    </label>
+                    <select
+                      class="form-select"
+                      formControlName="country"
+                    >
+                      <option value="US">United States</option>
+                      <option value="NP">Nepal</option>
+                      <option value="CA">Canada</option>
+                      <option value="GB">United Kingdom</option>
+                      <option value="AU">Australia</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+            </section>
+          }
+
+          <!-- STEP 3 -->
+          @if (currentStep() === 3) {
+            <section class="form-step">
+
+              <div class="section-heading">
+                <div>
+                  <span class="section-kicker">03 — FINANCIAL PROFILE</span>
+                  <h3>Banking & financial</h3>
+                  <p>Enter the banking and financial details for this merchant.</p>
+                </div>
+              </div>
+
+              <div class="security-notice">
+                <div class="security-icon">✓</div>
+                <div>
+                  <strong>Protected financial information</strong>
+                  <p>
+                    Sensitive fields (account number, tax ID) are stored
+                    securely and masked for SALES users on the detail view.
+                  </p>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label class="form-label">
+                  Bank name <span>*</span>
+                </label>
+                <input
+                  class="form-control"
+                  formControlName="bankName"
+                  placeholder="Enter bank name"
+                  [class.is-invalid]="showError('bankName')"
+                />
+                @if (showError('bankName')) {
+                  <div class="invalid-feedback">
+                    {{ getError('bankName') }}
+                  </div>
+                }
+              </div>
+
+              <div class="field-group">
+                <label class="form-label">
+                  Bank account number <span>*</span>
+                </label>
+                <input
+                  class="form-control"
+                  formControlName="bankAccountNumber"
+                  placeholder="Enter account number"
+                  [class.is-invalid]="showError('bankAccountNumber')"
+                  autocomplete="off"
+                />
+                @if (showError('bankAccountNumber')) {
+                  <div class="invalid-feedback">
+                    {{ getError('bankAccountNumber') }}
+                  </div>
+                }
+              </div>
+
+              <div class="field-group">
+                <label class="form-label">
+                  Tax ID / EIN <span>*</span>
+                </label>
+                <input
+                  class="form-control"
+                  formControlName="taxId"
+                  placeholder="Enter tax identification number"
+                  [class.is-invalid]="showError('taxId')"
+                  autocomplete="off"
+                />
+                @if (showError('taxId')) {
+                  <div class="invalid-feedback">
+                    {{ getError('taxId') }}
+                  </div>
+                }
+              </div>
+
+              <div class="field-group">
+                <label class="form-label">
+                  Expected monthly volume (USD) <span>*</span>
+                </label>
+                <div class="input-with-prefix">
+                  <span class="input-prefix">$</span>
+                  <input
+                    class="form-control"
+                    type="number"
+                    formControlName="expectedMonthlyVolume"
+                    placeholder="0.00"
+                    [class.is-invalid]="showError('expectedMonthlyVolume')"
+                    min="0"
+                  />
+                </div>
+                @if (showError('expectedMonthlyVolume')) {
+                  <div class="invalid-feedback">
+                    {{ getError('expectedMonthlyVolume') }}
+                  </div>
+                }
+              </div>
+
+            </section>
+          }
+
+        </div>
+
+        <!-- Form footer -->
+        <div class="form-footer">
+
+          <div class="footer-left">
+            @if (currentStep() > 1) {
+              <button
+                type="button"
+                class="btn-back"
+                (click)="prevStep()"
+              >
+                <span>←</span>
+                Back
+              </button>
+            }
+          </div>
+
+          <div class="footer-actions">
+
+            <button
+              type="button"
+              class="btn-draft"
+              (click)="saveDraft()"
+              [disabled]="saving() || !form.get('businessName')?.value"
+            >
+              Save draft
+            </button>
+
+            @if (currentStep() < totalSteps) {
+              <button
+                type="button"
+                class="btn-next"
+                (click)="nextStep()"
+              >
+                Continue
+                <span>→</span>
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="btn-submit"
+                (click)="submit()"
+                [disabled]="form.invalid || saving()"
+              >
+                Submit application
+                <span>→</span>
+              </button>
+            }
+
+          </div>
+        </div>
+
+      </form>
+    </main>
+
+    <div class="page-bottom-note">
+      <span class="bottom-note-dot"></span>
+      Your application progress is saved securely.
+    </div>
+
+  </div>
+</div>

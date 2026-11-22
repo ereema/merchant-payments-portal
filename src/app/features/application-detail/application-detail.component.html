@@ -1,0 +1,444 @@
+
+<div class="detail-page">
+  <div class="detail-shell">
+
+    @if (loading()) {
+      <div class="detail-loading">
+        <div class="loading-spinner"></div>
+        <span>Loading merchant information...</span>
+      </div>
+    } @else if (error()) {
+      <div class="detail-error">
+        <div class="error-mark">!</div>
+        <div>
+          <strong>Unable to load application</strong>
+          <p>{{ error() }}</p>
+          <a routerLink="/dashboard">← Back to dashboard</a>
+        </div>
+      </div>
+    } @else if (app(); as a) {
+
+      <!-- Page header -->
+      <header class="detail-header">
+        <div class="detail-header-main">
+          <a routerLink="/dashboard" class="back-link">
+            <span>←</span>
+            Applications
+          </a>
+
+          <div class="merchant-heading">
+            <div class="merchant-heading-content">
+              <div class="merchant-overline">MERCHANT APPLICATION</div>
+              <h1>{{ a.businessName }}</h1>
+
+              <div class="merchant-status-row">
+                <span class="status-badge {{ statusBadgeClass(a.status) }}">
+                  {{ a.status }}
+                </span>
+
+                @if (a.isDraft) {
+                  <span class="draft-indicator">Draft application</span>
+                }
+              </div>
+            </div>
+
+            @if (a.isDraft) {
+              <a
+                [routerLink]="['/applications', a.id, 'edit']"
+                class="continue-button"
+              >
+                <span>✎</span>
+                Continue editing
+                <span class="button-arrow">→</span>
+              </a>
+            }
+          </div>
+        </div>
+      </header>
+
+      <!-- Main layout -->
+      <div class="detail-layout">
+
+        <!-- LEFT COLUMN -->
+        <main class="detail-main">
+
+          <!-- Business information -->
+          <section class="detail-card">
+            <div class="detail-card-header">
+              <div class="card-heading-left">
+                <div class="section-icon business-icon">B</div>
+                <div>
+                  <h2>Business information</h2>
+                  <p>Registered company details</p>
+                </div>
+              </div>
+              <span class="section-number">01</span>
+            </div>
+
+            <div class="detail-card-body">
+              <div class="information-grid">
+                <div class="information-item">
+                  <span class="info-label">Business type</span>
+                  <strong>{{ a.businessType || '—' }}</strong>
+                </div>
+
+                <div class="information-item">
+                  <span class="info-label">Registration number</span>
+                  <strong>{{ a.registrationNumber || '—' }}</strong>
+                </div>
+
+                <div class="information-item">
+                  <span class="info-label">Industry</span>
+                  <strong>{{ a.industry || '—' }}</strong>
+                </div>
+
+                <div class="information-item">
+                  <span class="info-label">Website</span>
+                  @if (a.website) {
+                    <a
+                      class="website-link"
+                      [href]="a.website"
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      {{ a.website }}
+                      <span>↗</span>
+                    </a>
+                  } @else {
+                    <strong class="empty-value">—</strong>
+                  }
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Contact and address -->
+          <section class="detail-card">
+            <div class="detail-card-header">
+              <div class="card-heading-left">
+                <div class="section-icon contact-icon">C</div>
+                <div>
+                  <h2>Contact & address</h2>
+                  <p>Primary contact and business location</p>
+                </div>
+              </div>
+              <span class="section-number">02</span>
+            </div>
+
+            <div class="detail-card-body">
+              <div class="contact-primary">
+                <span class="contact-initial">👤</span>
+                <div>
+                  <span class="info-label">Primary contact</span>
+                  <strong>{{ a.contactName || '—' }}</strong>
+                </div>
+              </div>
+
+              <div class="contact-details-grid">
+                <div class="contact-detail">
+                  <span class="contact-detail-icon">@</span>
+                  <div>
+                    <span class="info-label">Email address</span>
+                    <strong>{{ a.contactEmail || '—' }}</strong>
+                  </div>
+                </div>
+
+                <div class="contact-detail">
+                  <span class="contact-detail-icon">#</span>
+                  <div>
+                    <span class="info-label">Phone number</span>
+                    <strong>{{ a.contactPhone || '—' }}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="address-block">
+                <span class="address-label">BUSINESS ADDRESS</span>
+                <p>
+                  {{ a.addressLine1 }}{{ a.addressLine2 ? ', ' + a.addressLine2 : '' }}
+                </p>
+                <p class="address-secondary">
+                  {{ a.city }}, {{ a.state }} {{ a.postalCode }}
+                </p>
+                <span class="country-label">{{ a.country }}</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Banking and sensitive data -->
+          <section class="detail-card">
+            <div class="detail-card-header">
+              <div class="card-heading-left">
+                <div class="section-icon banking-icon">S</div>
+                <div>
+                  <h2>Banking & sensitive data</h2>
+                  <p>Financial and identification information</p>
+                </div>
+              </div>
+
+              <div class="security-indicator">
+                <span class="security-dot"></span>
+                Protected
+              </div>
+            </div>
+
+            <div class="detail-card-body">
+              <div class="bank-name-block">
+                <span class="info-label">Bank name</span>
+                <strong>{{ a.bankName || '—' }}</strong>
+              </div>
+
+              <div class="sensitive-field">
+                <div>
+                  <span class="info-label">Account number</span>
+                  <code>{{ revealAccount() ? a.bankAccountNumber : mask(a.bankAccountNumber) }}</code>
+                </div>
+
+                <div class="sensitive-action">
+                  @if (revealAccount()) {
+                    <button
+                      type="button"
+                      class="reveal-button is-revealed"
+                      (click)="toggleRevealAccount()"
+                    >
+                      Hide
+                    </button>
+                  } @else {
+                    @if (auth.canRevealSensitive()) {
+                      <button
+                        type="button"
+                        class="reveal-button"
+                        (click)="toggleRevealAccount()"
+                      >
+                        Reveal
+                      </button>
+                    } @else {
+                      <span class="masked-label">Masked</span>
+                    }
+                  }
+                </div>
+              </div>
+
+              <div class="sensitive-field">
+                <div>
+                  <span class="info-label">Tax ID / EIN</span>
+                  <code>{{ revealTaxId() ? a.taxId : mask(a.taxId) }}</code>
+                </div>
+
+                <div class="sensitive-action">
+                  @if (revealTaxId()) {
+                    <button
+                      type="button"
+                      class="reveal-button is-revealed"
+                      (click)="toggleRevealTaxId()"
+                    >
+                      Hide
+                    </button>
+                  } @else {
+                    @if (auth.canRevealSensitive()) {
+                      <button
+                        type="button"
+                        class="reveal-button"
+                        (click)="toggleRevealTaxId()"
+                      >
+                        Reveal
+                      </button>
+                    } @else {
+                      <span class="masked-label">Masked</span>
+                    }
+                  }
+                </div>
+              </div>
+
+              <div class="volume-block">
+                <span class="info-label">Expected monthly volume</span>
+                <strong>{{ a.expectedMonthlyVolume | number }} <small>USD</small></strong>
+              </div>
+
+              @if (!auth.canRevealSensitive()) {
+                <div class="masked-notice">
+                  <span>i</span>
+                  Sensitive information is masked based on your access permissions.
+                </div>
+              }
+            </div>
+          </section>
+
+          <!-- Risk decision history -->
+          <section class="detail-card history-card">
+            <div class="detail-card-header">
+              <div class="card-heading-left">
+                <div class="section-icon history-icon">H</div>
+                <div>
+                  <h2>Risk decision history</h2>
+                  <p>Previous review activity and decisions</p>
+                </div>
+              </div>
+              <span class="section-number">04</span>
+            </div>
+
+            <div class="history-content">
+              @if (a.riskHistory.length === 0) {
+                <div class="empty-history">
+                  <div class="empty-history-icon">—</div>
+                  <strong>No decisions yet</strong>
+                  <p>Review activity will appear here once a decision is recorded.</p>
+                </div>
+              } @else {
+                <div class="history-list">
+                  @for (r of a.riskHistory; track r.id) {
+                    <div class="history-entry">
+                      <div class="history-marker">
+                        <span></span>
+                      </div>
+
+                      <div class="history-entry-content">
+                        <div class="history-entry-top">
+                          <span
+                            class="decision-badge"
+                            [class.decision-approved]="r.decision === 'APPROVE'"
+                            [class.decision-rejected]="r.decision === 'REJECT'"
+                            [class.decision-requested]="r.decision === 'REQUEST_INFO'"
+                          >
+                            {{ r.decision }}
+                          </span>
+
+                          <time>{{ r.createdAt | date: 'medium' }}</time>
+                        </div>
+
+                        <p class="history-comment">{{ r.comment }}</p>
+                        <span class="reviewer-name">
+                          Reviewed by {{ r.reviewerName }}
+                        </span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </section>
+
+        </main>
+
+        <!-- RIGHT SIDEBAR -->
+        <aside class="detail-sidebar">
+
+          <!-- Metadata -->
+          <section class="detail-card meta-card">
+            <div class="detail-card-header">
+              <div class="card-heading-left">
+                <div class="section-icon meta-icon">i</div>
+                <div>
+                  <h2>Application details</h2>
+                  <p>Record information</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="meta-content">
+              <div class="meta-item">
+                <span class="info-label">Created by</span>
+                <strong>{{ a.createdByName || '—' }}</strong>
+              </div>
+
+              <div class="meta-item">
+                <span class="info-label">Created on</span>
+                <strong>{{ a.createdAt | date: 'medium' }}</strong>
+              </div>
+
+              <div class="meta-item">
+                <span class="info-label">Last updated</span>
+                <strong>{{ a.updatedAt | date: 'medium' }}</strong>
+              </div>
+
+              @if (a.assignedReviewerName) {
+                <div class="meta-item">
+                  <span class="info-label">Assigned reviewer</span>
+                  <strong>{{ a.assignedReviewerName }}</strong>
+                </div>
+              }
+            </div>
+          </section>
+
+          <!-- Review controls -->
+          @if (auth.canReview() && a.status !== 'APPROVED' && a.status !== 'REJECTED' && !a.isDraft) {
+            <section class="review-card">
+              <div class="review-card-header">
+                <div class="review-header-icon">✓</div>
+                <div>
+                  <h2>Record decision</h2>
+                  <p>Review this merchant application</p>
+                </div>
+              </div>
+
+              <div class="review-card-body">
+
+                @if (reviewError()) {
+                  <div class="review-error">
+                    <span>!</span>
+                    {{ reviewError() }}
+                  </div>
+                }
+
+                <div class="review-field">
+                  <label for="reviewDecision">Decision</label>
+                  <select
+                    id="reviewDecision"
+                    class="form-select"
+                    [(ngModel)]="reviewDecision"
+                  >
+                    <option value="APPROVE">Approve</option>
+                    <option value="REJECT">Reject</option>
+                    <option value="REQUEST_INFO">Request more info</option>
+                  </select>
+                </div>
+
+                <div class="review-field">
+                  <label for="reviewComment">
+                    Comment <span>*</span>
+                  </label>
+                  <textarea
+                    id="reviewComment"
+                    class="form-control"
+                    rows="4"
+                    [(ngModel)]="reviewComment"
+                    placeholder="Add your review notes or reason for this decision..."
+                  ></textarea>
+                </div>
+
+                <button
+                  type="button"
+                  class="submit-review-button"
+                  [disabled]="reviewing() || !reviewComment.trim()"
+                  (click)="submitReview()"
+                >
+                  @if (reviewing()) {
+                    <span class="button-spinner"></span>
+                    Saving decision...
+                  } @else {
+                    Submit decision
+                    <span>→</span>
+                  }
+                </button>
+
+                <p class="review-footnote">
+                  Your decision and comment will be added to the risk history.
+                </p>
+              </div>
+            </section>
+          }
+
+          <!-- Sidebar note -->
+          <div class="sidebar-note">
+            <span class="sidebar-note-icon">i</span>
+            <p>
+              Application information is available according to your assigned
+              access permissions.
+            </p>
+          </div>
+
+        </aside>
+      </div>
+    }
+  </div>
+</div>

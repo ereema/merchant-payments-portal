@@ -1,0 +1,290 @@
+
+<div class="dashboard">
+
+  <!-- Page heading -->
+  <header class="dashboard-header">
+    <div class="heading-main">
+      <div class="heading-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="4" y="3" width="16" height="18" rx="3"></rect>
+          <path d="M8 8h8M8 12h8M8 16h4"></path>
+        </svg>
+      </div>
+
+      <div class="heading-copy">
+        <div class="breadcrumb">
+          Workspace <span>/</span> Applications
+        </div>
+        <h1>Applications</h1>
+        <p>Manage and track your merchant applications.</p>
+      </div>
+    </div>
+
+    @if (canCreate()) {
+      <a routerLink="/applications/new" class="create-button">
+        <span class="plus-icon">+</span>
+        New application
+        <span class="button-arrow">↗</span>
+      </a>
+    }
+  </header>
+
+  <!-- Applications panel -->
+  <section class="applications-panel">
+
+    <!-- Search and filters -->
+    <div class="toolbar">
+
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m16 16 4 4"></path>
+        </svg>
+
+        <input
+          type="text"
+          placeholder="Search business or registration number"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (keyup.enter)="onSearch()"
+        />
+
+        <span class="search-hint">Enter</span>
+      </div>
+
+      <div class="filter-actions">
+
+        <span class="record-count">
+          <strong>{{ total() }}</strong> records
+        </span>
+
+        <div class="filter-label">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 6h16M7 12h10M10 18h4"></path>
+          </svg>
+          Filter
+        </div>
+
+        <div class="status-select">
+          <select
+            [ngModel]="statusFilter()"
+            (ngModelChange)="statusFilter.set($event); onStatusChange()"
+            aria-label="Filter by application status"
+          >
+            @for (status of statusOptions; track $index) {
+              <option [value]="status">
+                {{ status || 'All statuses' }}
+              </option>
+            }
+          </select>
+
+          <svg class="select-chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m7 10 5 5 5-5"></path>
+          </svg>
+        </div>
+
+        <button
+          type="button"
+          class="search-button"
+          (click)="onSearch()"
+        >
+          Search
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    @if (loading()) {
+      <div class="loading-state">
+        <span class="loader"></span>
+        <span>Loading applications...</span>
+      </div>
+    }
+
+    <!-- Error state -->
+    @else if (error()) {
+      <div class="state-container">
+        <div class="state-icon error-icon">!</div>
+
+        <h3>Unable to load applications</h3>
+        <p>{{ error() }}</p>
+
+        <button
+          type="button"
+          class="secondary-button"
+          (click)="load()"
+        >
+          Try again
+        </button>
+      </div>
+    }
+
+    <!-- Empty state -->
+    @else if (applications().length === 0) {
+      <div class="state-container">
+        <div class="state-icon empty-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="5" y="3" width="14" height="18" rx="2"></rect>
+            <path d="M9 8h6M9 12h6M9 16h3"></path>
+          </svg>
+        </div>
+
+        <h3>No applications found</h3>
+        <p>Try adjusting your search or selecting a different status.</p>
+
+        <button
+          type="button"
+          class="secondary-button"
+          (click)="search.set(''); statusFilter.set(''); onSearch()"
+        >
+          Clear filters
+        </button>
+      </div>
+    }
+
+    <!-- Applications table -->
+    @else {
+      <div class="table-wrap">
+        <table class="applications-table">
+
+          <thead>
+            <tr>
+              <th class="sn-column">SN</th>
+              <th class="business-heading">BUSINESS</th>
+              <th>REGISTRATION NUMBER</th>
+              <th>STATUS</th>
+              <th>CONTACT</th>
+              <th>CREATED BY</th>
+              <th>LAST UPDATED</th>
+              <th class="action-heading"></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (app of applications(); track app.id; let i = $index) {
+              <tr>
+
+                <!-- Serial number -->
+                <td class="sn-cell">
+                  {{ (page() - 1) * pageSize + i + 1 }}
+                </td>
+
+                <!-- Business -->
+                <td>
+                  <div class="business-cell">
+                    <span class="business-name">
+                      {{ app.businessName }}
+                    </span>
+                    <span class="business-caption">
+                      Merchant application
+                    </span>
+                  </div>
+                </td>
+
+                <!-- Registration number -->
+                <td>
+                  <span class="registration-number">
+                    {{ app.registrationNumber || '—' }}
+                  </span>
+                </td>
+
+                <!-- Status -->
+                <td>
+                  <span
+                    class="status-label"
+                    [ngClass]="{
+                      'status-draft': app.status === 'DRAFT',
+                      'status-submitted': app.status === 'SUBMITTED',
+                      'status-review': app.status === 'IN_REVIEW',
+                      'status-approved': app.status === 'APPROVED',
+                      'status-rejected': app.status === 'REJECTED'
+                    }"
+                  >
+                    <span class="status-dot"></span>
+                    {{ app.status.replace('_', ' ') }}
+                  </span>
+                </td>
+
+                <!-- Contact -->
+                <td>
+                  <span class="contact-email">
+                    {{ app.contactEmail || '—' }}
+                  </span>
+                </td>
+
+                <!-- Created by -->
+                <td>
+                  <span class="created-by">
+                    {{ app.createdByName || '—' }}
+                  </span>
+                </td>
+
+                <!-- Last updated -->
+                <td>
+                  <span class="updated-date">
+                    {{ app.updatedAt | date:'dd MMM yyyy' }}
+                  </span>
+                </td>
+
+                <!-- View action -->
+                <td class="action-cell">
+                  <a
+                    [routerLink]="['/applications', app.id]"
+                    class="view-link"
+                  >
+                    View details
+                    <span class="view-arrow">↗</span>
+                  </a>
+                </td>
+
+              </tr>
+            }
+          </tbody>
+
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+
+        <div class="pagination-info">
+          <span class="pagination-indicator"></span>
+          Page <strong>{{ page() }}</strong>
+          of <strong>{{ totalPages() }}</strong>
+        </div>
+
+        <div class="pagination-actions">
+
+          <button
+            type="button"
+            class="page-button"
+            [disabled]="page() === 1"
+            (click)="goToPage(page() - 1)"
+          >
+            <span>←</span> Previous
+          </button>
+
+          <button
+            type="button"
+            class="page-button"
+            [disabled]="page() === totalPages()"
+            (click)="goToPage(page() + 1)"
+          >
+            Next <span>→</span>
+          </button>
+
+        </div>
+      </div>
+    }
+
+  </section>
+
+  <!-- Footer -->
+  <footer class="dashboard-footer">
+    <span>Merchant Payments</span>
+    <span class="footer-dot">•</span>
+    <span>Application management</span>
+  </footer>
+
+</div>

@@ -1,0 +1,82 @@
+/* Global styles – Bootstrap loaded via CDN */
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+:root {
+  --mpp-primary: #2563eb;
+  --mpp-primary-dark: #1d4ed8;
+  --mpp-surface: #ffffff;
+  --mpp-bg: #f1f5f9;
+  --mpp-border: #e2e8f0;
+  --mpp-text: #0f172a;
+  --mpp-muted: #64748b;
+}
+
+body {
+  background-color: var(--mpp-bg);
+  color: var(--mpp-text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.card {
+  border: 1px solid var(--mpp-border);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.card-header {
+  background: #fff;
+  border-bottom: 1px solid var(--mpp-border);
+  font-weight: 600;
+}
+
+.btn-primary {
+  background-color: var(--mpp-primary);
+  border-color: var(--mpp-primary);
+}
+.btn-primary:hover {
+  background-color: var(--mpp-primary-dark);
+  border-color: var(--mpp-primary-dark);
+}
+
+.table th {
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--mpp-muted);
+}
+
+.badge {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Login page */
+.login-wrapper {
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 50%, #f1f5f9 100%);
+}
+.login-card {
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 10px 40px -10px rgba(37, 99, 235, 0.15);
+}
+
+/* Form polish */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--mpp-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.progress {
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+.progress-bar {
+  background: var(--mpp-primary);
+  border-radius: 999px;
+}

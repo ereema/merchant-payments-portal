@@ -1,0 +1,111 @@
+
+@if (showNav()) {
+  <div class="app-shell">
+
+    <aside class="sidebar">
+      <a class="brand" routerLink="/dashboard">
+        <span class="brand-symbol">
+          <span></span>
+          <span></span>
+        </span>
+        <span class="brand-name">Merchant<span>Payments</span></span>
+      </a>
+
+      <div class="sidebar-caption">WORKSPACE</div>
+
+      <nav class="side-navigation" aria-label="Main navigation">
+        <a
+          class="side-link"
+          routerLink="/dashboard"
+          routerLinkActive="selected"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/>
+              <rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/>
+              <rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/>
+              <rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>
+            </svg>
+          </span>
+          <span>Dashboard</span>
+          <span class="active-indicator"></span>
+        </a>
+
+        @if (auth.hasRole('SALES', 'ADMIN')) {
+          <a
+            class="side-link"
+            routerLink="/applications/new"
+            routerLinkActive="selected"
+          >
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 5v14M5 12h14"/>
+                <rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+              </svg>
+            </span>
+            <span>New Application</span>
+            <span class="active-indicator"></span>
+          </a>
+        }
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-decoration">
+          <span class="decoration-orbit orbit-one"></span>
+          <span class="decoration-orbit orbit-two"></span>
+          <span class="decoration-core"></span>
+          <span class="decoration-caption">BUILT FOR BUSINESS</span>
+        </div>
+
+        <div class="sidebar-footer">
+          <span class="footer-dot"></span>
+          <span>Merchant workspace</span>
+        </div>
+      </div>
+    </aside>
+
+    <section class="workspace">
+      <header class="workspace-header">
+        <div class="workspace-heading">
+          <span class="header-overline">MERCHANT PAYMENTS</span>
+          <span class="header-divider"></span>
+          <span class="header-location">Workspace</span>
+        </div>
+
+        <div class="header-account">
+          <div class="account-details">
+            <span class="account-name">{{ auth.currentUser()?.name }}</span>
+            <span class="account-role">{{ auth.role() }}</span>
+          </div>
+
+          <div class="account-avatar" aria-hidden="true">
+            {{ (auth.currentUser()?.name || 'M').charAt(0).toUpperCase() }}
+          </div>
+
+          <button
+            class="logout-button"
+            type="button"
+            (click)="auth.logout()"
+            aria-label="Logout"
+            title="Logout"
+          >
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M10 17l5-5-5-5M15 12H3"/>
+              <path d="M12 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace-content">
+        <router-outlet />
+      </main>
+    </section>
+
+  </div>
+} @else {
+  <main class="auth-shell">
+    <router-outlet />
+  </main>
+}
